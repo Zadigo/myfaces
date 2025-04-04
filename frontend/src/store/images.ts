@@ -1,11 +1,10 @@
-import { defineStore } from "pinia"
-import { computed, ref } from "vue"
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 import type { Face, UserScore } from '../types'
 
 const NUMBER_OF_LEVELS = 2
 
 // const NUMBER_OF_IMAGES = 10
-
 
 export const useFaces = defineStore('images', () => {
   const faces = ref<Face[]>([])
@@ -39,7 +38,7 @@ export const useFaces = defineStore('images', () => {
 
   /**
    * Checks whether the image is the last image
-   * for the current round 
+   * for the current round
    */
   const isLastImageOfRound = computed(() => {
     return (currentIndex.value + 1) === count.value
@@ -56,8 +55,6 @@ export const useFaces = defineStore('images', () => {
         numeric: score,
         sentiment: null
       })
-    } else {
-      // Handle error
     }
   }
 
