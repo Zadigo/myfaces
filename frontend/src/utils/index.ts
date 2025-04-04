@@ -1,3 +1,3 @@
 export function inProduction() {
-    return import.meta.env.MODE !== 'development'
+  return import.meta.env.MODE !== 'development'
 }

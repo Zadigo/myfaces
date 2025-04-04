@@ -1,12 +1,12 @@
-/*eslint no-unused-vars: "off"*/
-/*eslint no-use-before-define: "off"*/
+/* eslint no-unused-vars: "off" */
+/* eslint no-use-before-define: "off" */
 
-import { BaseAnalytics } from "./base";
+import { BaseAnalytics } from './base'
 
 interface TagManagerOptions {
-  gtmId?: string;
+  gtmId?: string
 }
 
 declare class GoogleTagManager extends BaseAnalytics {
-  constructor(options?: TagManagerOptions);
+  constructor(options?: TagManagerOptions)
 }

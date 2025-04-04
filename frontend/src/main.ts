@@ -22,25 +22,25 @@ const vuetify = createVuetify({
   components,
   directives,
   date: {
-    adapter: DayJsAdapter,
+    adapter: DayJsAdapter
   },
   theme: {
     themes: {
       light: {
         dark: false,
         colors: {
-          primary: colors.red.darken1,
-        },
-      },
-    },
+          primary: colors.red.darken1
+        }
+      }
+    }
   },
   icons: {
     defaultSet: 'mdi',
     aliases,
     sets: {
-      mdi,
-    },
-  },
+      mdi
+    }
+  }
 })
 
 const pinia = createPinia()

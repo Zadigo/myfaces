@@ -7,14 +7,14 @@
 </template>
 
 <script setup lang="ts">
-import { useFaces } from '@/store/images';
-import { ref } from 'vue';
+import { useFaces } from '@/store/images'
+import { ref } from 'vue'
 
 const emit = defineEmits({
-  'score-selected' (_score: number) {
+  'score-selected'(_score: number) {
     return true
   },
-  'round-finished' (_action: string) {
+  'round-finished'(_action: string) {
     return true
   }
 })
@@ -24,9 +24,9 @@ const store = useFaces()
 const rankingMax = ref(5)
 
 /**
- * 
+ *
  */
-function handleScoreSelection (score: number) {
+function handleScoreSelection(score: number) {
   store.addScore(score)
   emit('score-selected', score)
 

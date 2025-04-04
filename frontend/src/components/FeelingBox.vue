@@ -20,12 +20,12 @@ const permutations = [
   ['neutral', 'sad', 'smile'],
   ['neutral', 'smile', 'sad'],
   ['smile', 'neutral', 'sad'],
-  ['smile', 'sad','neutral'],
+  ['smile', 'sad', 'neutral'],
   ['sad', 'smile', 'neutral']
 ]
 
 const emit = defineEmits({
-  'score-selected' (_feeling: string) {
+  'score-selected'(_feeling: string) {
     return true
   }
 })
@@ -40,21 +40,21 @@ const selectedPermutation = computed<['sad', 'neutral', 'sad']>(() => {
 })
 
 /**
- * 
+ *
  */
-function translatetToIcon (feeling: 'sad' | 'neutral' | 'sad'): string[] {
+function translatetToIcon(feeling: 'sad' | 'neutral' | 'sad'): string[] {
   const mappingTable = {
-    'sad': ['md:emoticon-sad', 'face-frown'],
-    'neutral': ['md:emoticon-neutral', 'face-meh'],
-    'smile': ['md:emoticon-smile', 'face-smile']
+    sad: ['md:emoticon-sad', 'face-frown'],
+    neutral: ['md:emoticon-neutral', 'face-meh'],
+    smile: ['md:emoticon-smile', 'face-smile']
   }
   return mappingTable[feeling]
 }
 
 /**
- * 
+ *
  */
-function handleChangePermutation (feeling: string) {
+function handleChangePermutation(feeling: string) {
   const randomIndex = Math.floor(Math.random() * permutations.length)
   permutationIndex.value = randomIndex
 

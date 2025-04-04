@@ -1,12 +1,12 @@
-/*eslint no-unused-vars: "off"*/
-/*eslint no-use-before-define: "off"*/
+/* eslint no-unused-vars: "off" */
+/* eslint no-use-before-define: "off" */
 
 declare class BaseAnalytics {
-  configured: boolean;
+  configured: boolean
 
-  constructor(options): void;
+  constructor(options): void
 
-  createScriptBody(): string | null;
+  createScriptBody(): string | null
 }
 
-export { BaseAnalytics };
+export { BaseAnalytics }

@@ -1,5 +1,5 @@
-/*eslint no-unused-vars: "off"*/
-/*eslint no-use-before-define: "off"*/
+/* eslint no-unused-vars: "off" */
+/* eslint no-use-before-define: "off" */
 
 import { App, Ref } from 'vue'
 import { BaseStorage, BaseStorageOptions, SavedStorageData } from './base'
@@ -42,9 +42,9 @@ declare module 'vue' {
 }
 
 declare module 'pinia' {
-    interface PiniaCustomProperties {
-      $localstorage: VueLocalStorage
-    }
+  interface PiniaCustomProperties {
+    $localstorage: VueLocalStorage
+  }
 }
 
 export {

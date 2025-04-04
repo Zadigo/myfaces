@@ -19,13 +19,12 @@
           </v-menu>
         </template>
       </v-toolbar>
-      
+
       <v-card-text>
         <v-img :src="imagePath" :data-iteration="currentIndex" :alt="`${currentFace?.skin_color} woman`" cover />
 
         <v-divider class="mt-4 mb-4" />
-        
-        
+
         <v-btn v-if="store.isCompleted" @click="requestSaveScores">
           Finalize
         </v-btn>
@@ -60,8 +59,7 @@ const { faces, currentFace, currentIndex, currentLevel } = storeToRefs(store)
 const sentiments = ref<Emotions>()
 const evaluatedDate = ref(null)
 
-
-function sendMessage (data: Record<string, string>): string {
+function sendMessage(data: Record<string, string>): string {
   return JSON.stringify(data)
 }
 
@@ -71,7 +69,7 @@ const reachedFinalImage = computed(() => {
 
 whenever(reachedFinalImage, () => {
   if (currentLevel.value === 2) {
-    return 
+    return
   }
 
   if (currentLevel.value === 1) {
@@ -82,10 +80,10 @@ whenever(reachedFinalImage, () => {
 
 const { data, send } = useWebSocket(getBaseUrl('/ws/session', null, true, 8000), {
   immediate: true,
-  onConnected () {
-    send(sendMessage({'type': 'get.faces'}))
+  onConnected() {
+    send(sendMessage({ type: 'get.faces' }))
   },
-  onMessage () {
+  onMessage() {
     const dataObj = JSON.parse(data.value)
 
     if (dataObj.type === 'update.time') {
@@ -143,8 +141,8 @@ const currentComponent = computed(() => {
 
     case 3:
       component = markRaw(FeelingBox)
-      break;
-  
+      break
+
     default:
       component = markRaw(ScoringBox)
       break
@@ -174,9 +172,9 @@ const currentComponent = computed(() => {
 /**
  * Save the scores from the user to the backend
  */
- function requestSaveScores () {
-  send(sendMessage({'type': 'save.scores'}))
- }
+function requestSaveScores() {
+  send(sendMessage({ type: 'save.scores' }))
+}
 
 // async requestSaveScores () {
 //   try {
@@ -199,15 +197,15 @@ const currentComponent = computed(() => {
  * Updates the current image index in order to evaluate
  * the next face
  */
-function handleScoreSelection () {
+function handleScoreSelection() {
   store.increaseIndex()
 }
 
-function handleRoundFinished (action: 'scores' | 'sentiment') {
+function handleRoundFinished(action: 'scores' | 'sentiment') {
   send(sendMessage({
-    'type': 'round.finished',
-    'action': action,
-    'scores': store.userScores
+    type: 'round.finished',
+    action: action,
+    scores: store.userScores
   }))
 }
 
@@ -218,7 +216,7 @@ onBeforeMount(() => {
 
   // this.currentIndex = this.localStorageData.currentIndex || 0
   // this.currentLevel = this.localStorageData.currentLevel || 1
-  
+
   // this.store.userScores = this.localStorageData.userScores || []
   // this.store.userEmotions = this.localStorageData.userEmotions || []
 })
