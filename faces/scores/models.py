@@ -6,11 +6,11 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
 from scores import validators
 from scores.choices import Emotions, GenderChoices, SkinColor, ZodiacSigns
 from scores.managers import FaceManager
-from scores.utils import Zodiac, upload_to
+from scores.utils import astrologic_sign, session_creator, upload_to
 
 
 class UserDetail(models.Model):
@@ -121,9 +121,8 @@ class Face(models.Model):
 @receiver(post_save, sender=UserDetail)
 def evaluate_zodiac_sign(instance, created, **kwargs):
     if created:
-        zodiac = Zodiac()
-        candidate = zodiac.evaluate_date_of_birth(instance.date_of_birth)
-        instance.zodiac_sign = candidate[0]
+        result = astrologic_sign(instance.date_of_birth)
+        instance.zodiac_sign = result
         instance.save()
 
 
@@ -135,14 +134,7 @@ def create_score_id(instance, **kwargs):
 
 @receiver(pre_save, sender=UserDetail)
 def create_session_id(instance, **kwargs):
-    initial = f'sess_{get_random_string(10)}'
-    session_expiration = (
-        timezone.now() +
-        datetime.timedelta(seconds=7200)
-    )
-    timestamp = session_expiration.timestamp()
-    encoded_date = urlsafe_base64_encode(str(timestamp).encode('utf-8'))
-    instance.session = initial + f'-{encoded_date}'
+    instance.session = session_creator()
 
 
 @receiver(pre_save, sender=Score)

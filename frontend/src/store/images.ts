@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { Face, UserScore } from '../types'
+import type { Face, SessionCache, UserScore } from '../types'
 
 const NUMBER_OF_LEVELS = 2
 
@@ -13,6 +13,8 @@ export const useFaces = defineStore('images', () => {
   const scoringCompleted = ref(0)
   const userScores = ref<UserScore[]>([])
   const userEmotions = ref<string[]>([])
+
+  const cache = ref<SessionCache>()
 
   const count = computed(() => {
     return faces.value.length
@@ -49,13 +51,11 @@ export const useFaces = defineStore('images', () => {
   })
 
   function addScore(score: number) {
-    if (currentFace.value) {
-      userScores.value.push({
-        image: currentFace.value.id,
-        numeric: score,
-        sentiment: null
-      })
-    }
+    userScores.value.push({
+      image: currentFace.value.id,
+      numeric: score,
+      sentiment: null
+    })
   }
 
   function addSentiment(sentiment: string) {
@@ -100,6 +100,7 @@ export const useFaces = defineStore('images', () => {
   }
 
   return {
+    cache,
     addScore,
     addSentiment,
     addFeeling,

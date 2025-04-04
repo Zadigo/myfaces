@@ -1,11 +1,10 @@
-import type { App } from 'vue'
+import type { Plugin } from 'vue'
 
 import './fonts'
 
-export function installPlugins() {
+export function installPlugins(): Plugin {
   return {
-
-    install(app: App) {
+    install(app) {
       console.log(app)
     }
   }

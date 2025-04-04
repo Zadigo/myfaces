@@ -6,7 +6,12 @@ import stylistic from '@stylistic/eslint-plugin'
 
 export default typescriptEslint.config(
   { 
-    ignores: ['*.d.ts', '**/coverage', '**/dist']
+    ignores: [
+      '*.d.ts', 
+      '**/coverage', 
+      '**/dist', 
+      '**/src/volt/**'
+    ]
   },
   {
     plugins: {
@@ -38,6 +43,7 @@ export default typescriptEslint.config(
           "max": 1
         }
       }],
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
       '@typescript-eslint/unified-signatures': 'error',
       '@typescript-eslint/related-getter-setter-pairs': 'warn',
       '@typescript-eslint/no-unnecessary-type-arguments': 'warn',

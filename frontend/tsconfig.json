@@ -3,6 +3,7 @@
     "baseUrl": "./",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "resolveJsonModule": true,
     "paths": {
       "@/*": [
         "src/*"

@@ -22,11 +22,11 @@ class ValidateNewSession(Serializer):
     date_of_birth = fields.DateField()
     ethnicity = fields.ChoiceField(
         choices=SkinColor.choices,
-        default=SkinColor.BLACK
+        default='Black'
     )
     gender = fields.ChoiceField(
         choices=GenderChoices.choices,
-        default=GenderChoices.OTHER
+        default='Other'
     )
 
     def create(self, validated_data):
@@ -70,10 +70,6 @@ class ValidateUserDetails(Serializer):
     date_of_birth = fields.CharField()
     gender = fields.CharField()
     ethnicity = fields.CharField()
-
-    def save(self):
-        instance = UserDetail.objects.create(**self.validated_data)
-        return {'session': instance.session}
 
 
 class ValidateSession(Serializer):

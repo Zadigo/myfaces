@@ -1,5 +1,5 @@
+from django.urls import re_path
 from scores import consumers
-from django.urls import path, re_path
 
 websocket_urlpatterns = [
     re_path(

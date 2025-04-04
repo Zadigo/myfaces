@@ -11,32 +11,26 @@
 <script setup lang="ts">
 import { sessionCache } from '@/data'
 import { useFaces } from '@/store/images'
-import { useSessionStorage } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import { useRoute } from 'vue-router'
+import { useAxiosClient } from '@/plugins/client'
+
+import type { SessionCache } from '@/types'
 
 import BaseSite from '@/layouts/BaseSite.vue'
 
+// const { client } = useAxiosClient()
 const route = useRoute()
-
-const cache = useSessionStorage('cache', sessionCache, {
-  serializer: {
-    read(raw) {
-      return JSON.parse(raw)
-    },
-    write(value) {
-      return JSON.stringify(value)
-    }
-  }
-})
-
+const cache = useStorage<SessionCache>('cache', sessionCache)
 const storeFaces = useFaces()
 
-console.log(storeFaces, cache)
-
-// storeFaces.$subscribe(({ storeId }, state) => {
-//   storeId
-//   state
-// })
+storeFaces.$subscribe((_, state) => {
+  if (state.cache) {
+    cache.value = state.cache
+  }
+}, {
+  detached: true
+})
 </script>
 
 <style scoped>

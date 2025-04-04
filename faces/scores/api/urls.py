@@ -1,7 +1,7 @@
 from django.urls import re_path
 from scores.api import views
 
-app_name = 'api_scores'
+app_name = 'scores_api'
 
 urlpatterns = [
     re_path(
@@ -9,8 +9,14 @@ urlpatterns = [
         views.SessionValidity.as_view(),
         name='session_validity'
     ),
-    re_path(r'^user-details', views.user_details_view),
-    re_path(r'^ranking', views.ranking_view),
+    re_path(
+        r'^user-details', 
+        views.user_details_view
+    ),
+    re_path(
+        r'^ranking', 
+        views.ranking_view
+    ),
     re_path(
         r'^scores/submit$', 
         views.SubmitScores.as_view(),
@@ -19,7 +25,7 @@ urlpatterns = [
     re_path(
         r'^session$',
         views.CreateNewSession.as_view(),
-        name='create_new_session'
+        name='new_session'
     ),
     re_path(
         r'^emotions$',

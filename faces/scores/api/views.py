@@ -1,19 +1,17 @@
 import random
 
 from django.db.models.aggregates import Avg
-from rest_framework import fields
+from drf_spectacular.utils import (OpenApiExample, OpenApiParameter,
+                                   extend_schema, inline_serializer)
+from rest_framework import fields, status
 from rest_framework.decorators import api_view
-from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 from scores.api import serializers
 from scores.api.serializers import (FaceSerializer, ValidateScoreSerializer,
                                     ValidateUserDetails)
 from scores.choices import Emotions
 from scores.models import Face, Score, UserDetail
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_serializer
-from drf_spectacular.utils import inline_serializer
-from rest_framework import status
 
 EMOTIONS_PARAMS = [
     OpenApiParameter(
@@ -172,14 +170,6 @@ def ranking_view(request, **kwargs):
         key=lambda x: -x['average_score']
     )
     return Response(data=response_data)
-
-
-@api_view(['post'])
-def new_session(request, **kwargs):
-    serializer = serializers.ValidateNewSession(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    return Response(serializer.data)
 
 
 @extend_schema(operation_id='New Session')

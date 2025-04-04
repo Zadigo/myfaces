@@ -1,0 +1,15 @@
+[
+    {
+        "model": "scores.UserDetail",
+        "pk": 1,
+        "fields": {
+            "session": "sess_123",
+            "country": "France",
+            "date_of_birth": "2000-1-1",
+            "zodiac_sign": "Libra",
+            "ethnicity": "Black",
+            "gender": "Man",
+            "created_on": "2025-1-1"
+        }
+    }
+]
