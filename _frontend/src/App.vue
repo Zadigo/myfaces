@@ -9,21 +9,21 @@
 </template>
 
 <script setup lang="ts">
-import { sessionCache } from '@/data'
-import { useFaces } from '@/store/images'
-import { useSessionStorage } from '@vueuse/core'
-import { useRoute } from 'vue-router'
+import { sessionCache } from '@/data';
+import { useFaces } from '@/store/images';
+import { useSessionStorage } from '@vueuse/core';
+import { useRoute } from 'vue-router';
 
-import BaseSite from '@/layouts/BaseSite.vue'
+import BaseSite from '@/layouts/BaseSite.vue';
 
 const route = useRoute()
 
 const cache = useSessionStorage('cache', sessionCache, {
   serializer: {
-    read(raw) {
+    read (raw) {
       return JSON.parse(raw)
     },
-    write(value) {
+    write (value) {
       return JSON.stringify(value)
     }
   }
@@ -38,7 +38,3 @@ console.log(storeFaces, cache)
 //   state
 // })
 </script>
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,3000,4000,5000,7001,3001,4001,5001,700&display=swap')
-</style>

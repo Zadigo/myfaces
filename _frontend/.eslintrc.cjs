@@ -96,10 +96,10 @@ module.exports = {
       }
     ],
     "vue/max-attributes-per-line": ["warn", {
-      "singleline": {
-        "max": 15
+        "singleline": {
+          "max": 10
+        },
       },
-    },
     ],
     "vue/v-bind-style": ["error", "shorthand"]
   }
