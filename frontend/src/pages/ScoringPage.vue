@@ -4,10 +4,16 @@
       <v-toolbar color="white">
         <v-toolbar-title class="text-h6">
           Face / Image: {{ currentIndex + 1 }} / Level: {{ currentLevel }}
-          <p>{{ evaluatedDate }}</p>
+          <v-btn @click="handleReconnection">
+            Reconnect
+          </v-btn>
+          <v-btn @click="handleGetEmotions">
+            Emotions
+          </v-btn>
+          <!-- <p>{{ evaluatedDate }}</p> -->
         </v-toolbar-title>
 
-        <template #append>
+        <!-- <template #append>
           <v-menu transition="slide-x-transition">
             <template #activator="{ props }">
               <v-btn v-bind="props" icon="md:dots-vertical" />
@@ -17,24 +23,20 @@
               <v-list-item>Something</v-list-item>
             </v-list>
           </v-menu>
-        </template>
+        </template> -->
       </v-toolbar>
 
       <v-card-text>
-        <v-img :src="imagePath" :data-iteration="currentIndex" :alt="`${currentFace?.skin_color} woman`" cover />
+        <v-img :src="imagePath" :alt="`${currentFace?.skin_color} woman`" cover />
 
         <v-divider class="mt-4 mb-4" />
 
-        <v-btn v-if="store.isCompleted" @click="requestSaveScores">
+        <v-btn v-if="isCompleted">
           Finalize
         </v-btn>
 
         <div v-else class="scoring">
-          <!-- <scoring-box v-if="store.currentLevel === 1" @score-selected="handleScoreSelection" />
-          <sentiment-box v-else-if="store.currentLevel === 2" @score-selected="handleScoreSelection" />
-          <feeling-box v-else-if="store.currentLevel === 3" @score-selected="handleScoreSelection" /> -->
-
-          <component :is="currentComponent" @score-selected="handleScoreSelection" @round-finished="handleRoundFinished" />
+          <component :is="currentComponent" @score-selected="handleScoreSelection" @get-emotions="handleGetEmotions" />
         </div>
       </v-card-text>
     </v-card>
@@ -42,90 +44,24 @@
 </template>
 
 <script setup lang="ts">
-import { getBaseUrl } from '@/plugins/client'
+import { getWebsocketUrl, getDomain } from '@/plugins/client'
 import { useFaces } from '@/store/images'
-import { Emotions, Face, WSFaceResponse } from '@/types'
-import { useWebSocket, whenever } from '@vueuse/core'
+import { useStorage, useWebSocket } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { computed, markRaw, onBeforeMount, ref } from 'vue'
+import { computed, markRaw, ref } from 'vue'
+
+import type { WebsocketData, SendMessageData } from '@/types'
 
 import FeelingBox from '@/components/FeelingBox.vue'
 import ScoringBox from '@/components/ScoringBox.vue'
 import SentimentBox from '@/components/SentimentBox.vue'
 
+const sessionKey = useStorage<string>('sessionId', null)
 const store = useFaces()
-const { faces, currentFace, currentIndex, currentLevel } = storeToRefs(store)
+const { currentIndex, currentFace, currentLevel, sentiments } = storeToRefs(store)
 
-const sentiments = ref<Emotions>()
-const evaluatedDate = ref(null)
-
-function sendMessage(data: Record<string, string>): string {
-  return JSON.stringify(data)
-}
-
-const reachedFinalImage = computed(() => {
-  return currentIndex.value >= 11
-})
-
-whenever(reachedFinalImage, () => {
-  if (currentLevel.value === 2) {
-    return
-  }
-
-  if (currentLevel.value === 1) {
-    currentIndex.value = 0
-    currentLevel.value = 2
-  }
-})
-
-const { data, send } = useWebSocket(getBaseUrl('/ws/session', null, true, 8000), {
-  immediate: true,
-  onConnected() {
-    send(sendMessage({ type: 'get.faces' }))
-  },
-  onMessage() {
-    const dataObj = JSON.parse(data.value)
-
-    if (dataObj.type === 'update.time') {
-      evaluatedDate.value = dataObj.date
-    }
-
-    if (dataObj.type === 'get.faces') {
-      const data = dataObj as WSFaceResponse
-      faces.value = data.results as Face[]
-    }
-
-    if (dataObj.type === 'get.emotions') {
-      sentiments.value = dataObj as Emotions
-    }
-  }
-})
-
-// const unsubscribe = store.$subscribe((change) => {
-//   console.log(change)
-//   if (change.events.key === 'currentIndex') {
-//     // TODO: 11 is just for testing, we should
-//     // be running the whole image batch
-//     if (store.currentIndex >= 11) {
-//       store.currentLevel = 2
-//       store.currentIndex = 0
-//     }
-
-//     // if (store.currentIndex === 11 && store.currentLevel === 2) {
-//     //   // store.currentLevel = 3
-//     //   // store.currentIndex = 0
-//     // }
-//   }
-// })
-// onUnmounted(unsubscribe)
-
-const imagePath = computed(() => {
-  if (currentFace.value) {
-    return `http://127.0.0.1:8000/media/${currentFace.image}`
-  } else {
-    return 'https://placehold.co/300x300'
-  }
-})
+const isCompleted = ref<boolean>(false)
+// const emotions = ref<Emotions>([])
 
 const currentComponent = computed(() => {
   let component
@@ -150,74 +86,85 @@ const currentComponent = computed(() => {
   return component
 })
 
-/**
- * Gets a random list of faces to evaluate for the
- * actual scoring session
- */
-// async requestFaces () {
-//   try {
-//     // We are running multiple scoring methods on the same images. So there is no
-//     // need to get a new set of faces on every page reload
-//     if (this.localStorageData.faces && this.localStorageData.faces.length > 0) {
-//       this.faces = this.localStorageData.faces
-//     } else {
-//       const response = await this.$http.get<Face[]>('faces/random', { params: { size: 10 } })
-//       this.faces = response.data
-//       this.$localstorage.create('faces', this.faces)
-//     }
-//   } catch (e) {
-//     console.log(e)
-//   }
-// },
-/**
- * Save the scores from the user to the backend
- */
-function requestSaveScores() {
-  send(sendMessage({ type: 'save.scores' }))
+function sendMessage(data: SendMessageData): string {
+  return JSON.stringify(data)
 }
 
-// async requestSaveScores () {
-//   try {
-//     const requestData = {
-//       'scores': this.store.userScores,
-//       'emotions': this.store.userEmotions
-//     }
-//     console.log(requestData)
-//     this.$localstorage.create<Face[]>('faces', [])
-//     this.$localstorage.create<UserScore[]>('userScores', [])
-//     this.$localstorage.create('userEmotions', [])
-//     this.$localstorage.create('currentIndex', 0)
-//     this.$localstorage.create('currentLevel', 1)
-//     this.$router.push({ name: 'home' })
-//   } catch (e) {
-//     console.log(e)
-//   }
-// },
-/**
- * Updates the current image index in order to evaluate
- * the next face
- */
-function handleScoreSelection() {
-  store.increaseIndex()
-}
+const { data, send, status, open } = useWebSocket<string>(getWebsocketUrl('/ws/session'), {
+  immediate: true,
+  onConnected() {
+    if (sessionKey.value) {
+      send(sendMessage({ action: 'set.session_id', session_id: sessionKey.value }))
+    } else {
+      send(sendMessage({ action: 'get.session_id' }))
+    }
+    send(sendMessage({ action: 'random.face' }))
+  },
+  onMessage() {
+    if (data.value) {
+      const parsedData: WebsocketData = JSON.parse(data.value)
 
-function handleRoundFinished(action: 'scores' | 'sentiment') {
-  send(sendMessage({
-    type: 'round.finished',
-    action: action,
-    scores: store.userScores
-  }))
-}
+      if (parsedData.action === 'random.face') {
+        console.log(parsedData)
+        currentFace.value = parsedData.data
+      }
 
-onBeforeMount(() => {
-  // In case the page reloads, we have the possibility to
-  // reload what the user has already done and resume
-  // this.requestFaces()
+      if (parsedData.action === 'get.session_id') {
+        sessionKey.value = parsedData.token
+      }
 
-  // this.currentIndex = this.localStorageData.currentIndex || 0
-  // this.currentLevel = this.localStorageData.currentLevel || 1
+      if (parsedData.action === 'update.index') {
+        if (parsedData.index) {
+          currentIndex.value = parsedData.index
+        }
+      }
 
-  // this.store.userScores = this.localStorageData.userScores || []
-  // this.store.userEmotions = this.localStorageData.userEmotions || []
+      if (parsedData.action === 'next.level') {
+        if (parsedData.level) {
+          currentLevel.value = parsedData.level
+        }
+      }
+
+      if (parsedData.action === 'get.emotions') {
+        console.log(parsedData)
+        if (parsedData.level) {
+          sentiments.value = parsedData.data
+        }
+      }
+    }
+  }
 })
+
+const imagePath = computed(() => {
+  if (currentFace.value) {
+    const domain = getDomain()
+    return `${domain}media/${currentFace.value.image}`
+  } else {
+    return 'https://placehold.co/300x300'
+  }
+})
+
+function handleScoreSelection(value: number | string) {
+  console.log(value)
+  if (currentFace.value) {
+    send(sendMessage({
+      action: 'save.score',
+      face_id: currentFace.value.id,
+      score: value
+    }))
+  }
+}
+
+function handleReconnection() {
+  open()
+  send(sendMessage({ action: 'random.face' }))
+}
+
+console.log(status.value)
+
+// function handleRoundFinished() {}
+
+function handleGetEmotions() {
+  send(sendMessage({ action: 'get.emotions' }))
+}
 </script>

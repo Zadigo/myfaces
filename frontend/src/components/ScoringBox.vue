@@ -24,14 +24,11 @@ const store = useFaces()
 const rankingMax = ref(5)
 
 /**
- *
+ * Handles the action of adding a numerical
+ * score to the given face
  */
 function handleScoreSelection(score: number) {
   store.addScore(score)
   emit('score-selected', score)
-
-  if (store.isLastImageOfRound) {
-    emit('round-finished', 'scores')
-  }
 }
 </script>

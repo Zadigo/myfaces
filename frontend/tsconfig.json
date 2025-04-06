@@ -4,6 +4,7 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "resolveJsonModule": true,
+    "allowJs": false,
     "paths": {
       "@/*": [
         "src/*"

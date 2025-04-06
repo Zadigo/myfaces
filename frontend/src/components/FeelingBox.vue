@@ -9,8 +9,6 @@
 </template>
 
 <script setup lang="ts">
-// import { useFaces } from '@/store/images'
-// import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 
 type Permutations = string[][]
@@ -30,12 +28,9 @@ const emit = defineEmits({
   }
 })
 
-// const imagesStore = useFaces()
-// const { currentIndex } = storeToRefs(imagesStore)
-
 const availablePermutations = ref<Permutations>(permutations)
 const permutationIndex = ref(0)
-const selectedPermutation = computed<['sad', 'neutral', 'sad']>(() => {
+const selectedPermutation = computed<string[]>(() => {
   return availablePermutations.value[permutationIndex.value]
 })
 

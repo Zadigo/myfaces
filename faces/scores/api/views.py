@@ -5,13 +5,15 @@ from drf_spectacular.utils import (OpenApiExample, OpenApiParameter,
                                    extend_schema, inline_serializer)
 from rest_framework import fields, status
 from rest_framework.decorators import api_view
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import (CreateAPIView, GenericAPIView,
+                                     ListAPIView, RetrieveAPIView)
 from rest_framework.response import Response
 from scores.api import serializers
 from scores.api.serializers import (FaceSerializer, ValidateScoreSerializer,
                                     ValidateUserDetails)
 from scores.choices import Emotions
 from scores.models import Face, Score, UserDetail
+from scores.utils import session_creator
 
 EMOTIONS_PARAMS = [
     OpenApiParameter(
@@ -119,46 +121,6 @@ class SubmitScores(CreateAPIView):
         return Response(return_response, status=status.HTTP_201_CREATED)
 
 
-@api_view(['post'])
-def submit_scores_view(request):
-    serializer = ValidateScoreSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save(request=request)
-    return Response(data={'status': True})
-
-
-@api_view(['get'])
-def random_faces_view(request, **kwargs):
-    size = request.GET.get('size', 5)
-    queryset = Face.objects.sample_faces(size=size)
-    serializer = FaceSerializer(instance=queryset, many=True)
-    response_data = serializer.data
-    random.shuffle(response_data)
-    return Response(data=response_data)
-
-
-@api_view(['get'])
-def all_faces_view(request):
-    """Retrieve all the faces from the database"""
-    queryset = Face.objects.cached_all()
-    serializer = FaceSerializer(instance=queryset, many=True)
-    return Response(data=serializer.data)
-
-
-@api_view(['get'])
-def emotions_view(request, **kwargs):
-    """Retrieve all the emotions for the given session"""
-    return Response(data=Emotions.as_dict())
-
-
-@api_view(['post'])
-def user_details_view(request, **kwargs):
-    serializer = ValidateUserDetails(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    response_data = serializer.save()
-    return Response(data=response_data)
-
-
 @api_view(['get'])
 def ranking_view(request, **kwargs):
     response_data = {}
@@ -177,6 +139,11 @@ class CreateNewSession(CreateAPIView):
     """Creates new scoring session for the current user"""
 
     serializer_class = serializers.ValidateNewSession
+
+
+class NewSessionKey(GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        return Response({'token': session_creator()})
 
 
 @extend_schema(operation_id='Validate Session')

@@ -77,7 +77,7 @@ export function getWebsocketUrl(path: string, altDomain?: string | null | undefi
 /**
  * Function used to create a basic axios client that
  * can be used to send api requests
- * 
+ *
  * @param altDomain Alternative odmain to the one registered in useRuntimeConfig.public.prodUrl
  * @param [port=8000] The port of the backend (development only)
  */
@@ -93,7 +93,7 @@ export function createSimpleClient(altDomain?: string | null | undefined, port: 
 /**
  * Function that adds authentication intercepors on the base client
  * in order to send and handle authenticated requests
- * 
+ *
  * @param client The client to decorate with the intereceptors
  * @param access Access token
  * @param refresh Refresh token
@@ -124,7 +124,7 @@ function authenticationInterceptors(client: AxiosInstance, access?: string | nul
       const originalRequest = error.config as ExtendedInternalAxiosRequestConfig
 
       if (error.response) {
-        if (error.response.status === 401 && !originalRequest?._retry) {
+        if (error.response.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true
 
           try {
@@ -157,7 +157,7 @@ function authenticationInterceptors(client: AxiosInstance, access?: string | nul
  * It allows us to invoke composables such as "useCookies" from
  * vueuse and other composables that require client sotrages to
  * be fully available
- * 
+ *
  * @param altDomain Production domain used if inProduction() is true
  * @param [port=8000] Change the default port
  */
@@ -174,7 +174,7 @@ export function useAxiosClient(altDomain?: string | null | undefined, port: numb
 /**
  * Same as useAxiosClient but adds a layer of authentication
  * that with access and refresh tokens for protected views
- * 
+ *
  * @param access Access token
  * @param refresh Refresh token
  * @param altDomain Production domain used if inProduction() is true

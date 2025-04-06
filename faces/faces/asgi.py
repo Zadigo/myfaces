@@ -1,10 +1,10 @@
 import os
 
-from scores import routing as scores_routing
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
+from scores import routing as scores_routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'faces.settings')
 

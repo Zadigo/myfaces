@@ -7,25 +7,25 @@
 </template>
 
 <script setup lang="ts">
-import { useAxiosClient } from '@/plugins/client'
 import { useFaces } from '@/store/images'
-import { Emotions } from '@/types'
 import { storeToRefs } from 'pinia'
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+
+import type { Sentiments } from '@/types'
 
 const emit = defineEmits({
   'score-selected'(_sentiment: string) {
+    return true
+  },
+  'get-emotions'() {
     return true
   }
 })
 
 const imagesStore = useFaces()
-const { currentIndex } = storeToRefs(imagesStore)
+const { currentIndex, sentiments } = storeToRefs(imagesStore)
 
-const { client } = useAxiosClient()
-
-const sentiments = ref<Emotions>()
-const currentEmotions = ref<Emotions[]>([])
+const currentEmotions = ref<Sentiments[]>([])
 
 const positiveEmotions = computed(() => {
   if (sentiments.value) {
@@ -74,19 +74,6 @@ function generateRandomSentiments() {
 }
 
 /**
- *
- */
-async function requestSentiments() {
-  try {
-    const response = await client.get('/faces/emotions')
-    sentiments.value = response.data
-    generateRandomSentiments()
-  } catch {
-    // Handle error
-  }
-}
-
-/**
  * Function that handles the user's selection
  */
 function handleSentimentSelection(sentiment: string) {
@@ -101,7 +88,7 @@ watch(currentIndex, (n, o) => {
   }
 })
 
-onBeforeMount(() => {
-  requestSentiments()
+onMounted(() => {
+  emit('get-emotions')
 })
 </script>

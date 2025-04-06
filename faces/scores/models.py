@@ -1,16 +1,14 @@
-import datetime
 import pathlib
 
 from django.db import models
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
-from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.http import urlsafe_base64_decode
 from scores import validators
 from scores.choices import Emotions, GenderChoices, SkinColor, ZodiacSigns
 from scores.managers import FaceManager
-from scores.utils import astrologic_sign, session_creator, upload_to
+from scores.utils import (astrologic_sign, session_creator, session_is_valid,
+                          upload_to)
 
 
 class UserDetail(models.Model):
@@ -52,20 +50,7 @@ class UserDetail(models.Model):
         """Checks if the session that was initially created
         by the user is still valid. This allows us to validate
         or invalidate the completion of scoring sessions"""
-        if self.session is not None:
-            _, rhv = self.session.split('-')
-            if rhv is None:
-                return False
-
-            timestamp = urlsafe_base64_decode(rhv).decode('utf-8')
-            current_date = timezone.now()
-
-            tz = timezone.get_current_timezone()
-            expiration_date = datetime.datetime.fromtimestamp(
-                float(timestamp), tz=tz)
-
-            return expiration_date < current_date
-        return False
+        return session_is_valid(self.session)
 
 
 class Score(models.Model):

@@ -9,16 +9,16 @@ urlpatterns = [
         views.SessionValidity.as_view(),
         name='session_validity'
     ),
+    # re_path(
+    #     r'^user-details',
+    #     views.user_details_view
+    # ),
     re_path(
-        r'^user-details', 
-        views.user_details_view
-    ),
-    re_path(
-        r'^ranking', 
+        r'^ranking',
         views.ranking_view
     ),
     re_path(
-        r'^scores/submit$', 
+        r'^scores/submit$',
         views.SubmitScores.as_view(),
         name='submit_scores'
     ),
@@ -26,6 +26,11 @@ urlpatterns = [
         r'^session$',
         views.CreateNewSession.as_view(),
         name='new_session'
+    ),
+    re_path(
+        r'^session-key$',
+        views.NewSessionKey.as_view(),
+        name='session_key'
     ),
     re_path(
         r'^emotions$',

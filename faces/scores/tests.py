@@ -1,9 +1,10 @@
 import json
+from django.test import TestCase
 
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from scores.models import UserDetail
-from scores.utils import session_creator
+from scores.utils import session_creator, session_is_valid
 
 
 class TestFacesApi(APITestCase):
@@ -61,3 +62,15 @@ class TestFacesApi(APITestCase):
             'date_of_birth': '2000-1-1'
         })
         self.assertIn('session', response.json())
+
+
+class TestUtils(TestCase):
+    def test_create_session(self):
+        value = session_creator()
+        self.assertIsNotNone(value)
+        self.assertTrue(value.startswith('sess_'))
+
+    def test_validate_session(self):
+        value = session_creator()
+        result = session_is_valid(value)
+        self.assertTrue(result)

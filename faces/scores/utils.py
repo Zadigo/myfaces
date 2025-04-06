@@ -2,18 +2,37 @@ import datetime
 
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 
 def session_creator():
+    """Create a session key that is valid for 2 hours"""
     initial = f'sess_{get_random_string(10)}'
     session_expiration = (
         timezone.now() +
-        datetime.timedelta(seconds=7200)
+        datetime.timedelta(seconds=(120 * 60))
     )
     timestamp = session_expiration.timestamp()
     encoded_date = urlsafe_base64_encode(str(timestamp).encode('utf-8'))
     return initial + f'-{encoded_date}'
+
+
+def session_is_valid(value: str):
+    _, rhv = value.split('-')
+
+    if rhv is None:
+        return False
+
+    timestamp = urlsafe_base64_decode(rhv).decode('utf-8')
+    current_date = timezone.now()
+
+    tz = timezone.get_current_timezone()
+    expiration_date = datetime.datetime.fromtimestamp(
+        float(timestamp),
+        tz=tz
+    )
+
+    return False if current_date > expiration_date else True
 
 
 def upload_to(instance, image_name):
